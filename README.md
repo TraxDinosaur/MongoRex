@@ -23,7 +23,7 @@ MongoRex is a powerful and easy-to-use Python library that simplifies MongoDB op
 Install MongoRex using pip:
 
 ```bash
-pip install mongorex
+pip install MongoRex
 ```
 
 ---
@@ -35,7 +35,7 @@ Here’s how you can start using MongoRex in your Python application:
 ### 1. Initialize MongoRex
 
 ```python
-from mongorex import DataBase
+from MongoRex import DataBase
 
 # Replace with your MongoDB URI and database name
 mongo = DataBase(DB_Name="your_database", MongoURI="mongodb://localhost:27017")
