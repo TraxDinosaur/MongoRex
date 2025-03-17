@@ -2,7 +2,7 @@ import setuptools
 
 # Package metadata
 NAME = "MongoRex"
-VERSION = "1.0.0"
+VERSION = "1.0.1"
 DESCRIPTION = "MongoRex simplifies MongoDB operations by providing a clean, reusable interface for CRUD, indexing, aggregation, and database management tasks."
 URL = "https://github.com/TraxDinosaur/MongoRex"
 AUTHOR = "TraxDinosaur"

@@ -14,13 +14,18 @@ class DataBase:
 
     # Read Operations
     def find_doc(self, collection, query):
-        return self.dataBase[collection].find_one(query)
+        return self.dataBase[collection].find_one(query, {"_id": 0})
 
-    def find_docs(self, collection, query):
-        return self.dataBase[collection].find(query)
+    def find_docs(self, collection, query, regex_fields=None):
+        """Find multiple documents, supports regex search."""
+        if regex_fields:
+            regex_query = {"$or": [{field: {"$regex": query, "$options": "i"}} for field in regex_fields]}
+            return list(self.dataBase[collection].find(regex_query, {"_id": 0}))
+
+        return list(self.dataBase[collection].find(query, {"_id": 0}))
 
     def find_all(self, collection):
-        return self.dataBase[collection].find()
+        return list(self.dataBase[collection].find({}, {"_id": 0}))
 
     def count_docs(self, collection, query):
         return self.dataBase[collection].count_documents(query)
@@ -34,6 +39,10 @@ class DataBase:
         result = self.dataBase[collection].update_many(filter_query, {'$set': update_data})
         return result.modified_count
 
+    def update_field(self, collection, filter_query, field, value):
+        """Update a single field in a document."""
+        return self.dataBase[collection].update_one(filter_query, {"$set": {field: value}}).modified_count
+
     # Delete Operations
     def delete_doc(self, collection, query):
         result = self.dataBase[collection].delete_one(query)
@@ -43,9 +52,13 @@ class DataBase:
         result = self.dataBase[collection].delete_many(query)
         return result.deleted_count
 
+    def delete_all(self, collection):
+        """Delete all documents in a collection."""
+        return self.dataBase[collection].delete_many({})
+
     # Aggregate Operations
     def aggregate(self, collection, pipeline):
-        return self.dataBase[collection].aggregate(pipeline)
+        return list(self.dataBase[collection].aggregate(pipeline))
 
     # Index Operations
     def create_index(self, collection, keys, **kwargs):
@@ -55,7 +68,7 @@ class DataBase:
         return self.dataBase[collection].drop_index(index_name)
 
     def list_indexes(self, collection):
-        return self.dataBase[collection].list_indexes()
+        return list(self.dataBase[collection].list_indexes())
 
     # Collection Operations
     def drop_collection(self, collection):
@@ -88,6 +101,11 @@ class DataBase:
     # Rename Collection
     def rename_collection(self, old_name, new_name):
         return self.dataBase[old_name].rename(new_name)
+
+    # Get Latest Documents
+    def get_latest(self, collection, limit=5, sort_field="_id"):
+        """Get latest N documents sorted by a field."""
+        return list(self.dataBase[collection].find({}, {"_id": 0}).sort(sort_field, -1).limit(limit))
 
     # Watch for Changes
     def watch(self, collection=None, pipeline=None):
