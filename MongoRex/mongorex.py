@@ -16,13 +16,17 @@ class DataBase:
     def find_doc(self, collection, query):
         return self.dataBase[collection].find_one(query, {"_id": 0})
 
-    def find_docs(self, collection, query, regex_fields=None):
-        """Find multiple documents, supports regex search."""
+    def find_docs(self, collection, query, regex_fields=None, sort_field=None, sort_order=1):
         if regex_fields:
             regex_query = {"$or": [{field: {"$regex": query, "$options": "i"}} for field in regex_fields]}
-            return list(self.dataBase[collection].find(regex_query, {"_id": 0}))
+            query = regex_query
 
-        return list(self.dataBase[collection].find(query, {"_id": 0}))
+        cursor = self.dataBase[collection].find(query, {"_id": 0})
+
+        if sort_field:
+            cursor = cursor.sort(sort_field, sort_order)
+
+        return cursor
 
     def find_all(self, collection):
         return list(self.dataBase[collection].find({}, {"_id": 0}))
